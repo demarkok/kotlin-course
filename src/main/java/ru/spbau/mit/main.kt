@@ -25,45 +25,62 @@ class FenwickTree(private val size: Int) {
     }
 }
 
+class NameEditor(private val basicString: String, private val numberOfCopies: Int) {
 
-fun solve(k: Int, string: String, queries: List<Pair<Int, Char>>): String {
-    val len = string.length
+    private val alphabetSize = 26
+    private val maxLength = 200000
 
-    fun Char.inAlphabet(): Int = this - 'a'
-//    val letterOccurrences: IntArray = kotlin.IntArray(26, { c1 -> string.count { c2 -> c2 - 'a' == c1 } })
-    val letterOccurrences: Array<IntArray> = kotlin.Array(26, { c1 ->
-        string.withIndex()
+    private fun Char.inAlphabet(): Int = this - 'a'
+
+    private val letterOccurrences: Array<IntArray> = kotlin.Array(alphabetSize, { c1 ->
+        basicString.withIndex()
                 .filter { x -> x.value.inAlphabet() == c1 }
                 .map { x -> x.index }
                 .toIntArray()
     })
 
-    val removed: BooleanArray = kotlin.BooleanArray(k * len)
-    val letterChanges: Array<FenwickTree> = Array(26, { FenwickTree(200000) }) // letter -> fenwick tree of changes
+    private val isRemoved: BooleanArray = kotlin.BooleanArray(numberOfCopies * basicString.length)
 
+    private val letterChanges: Array<FenwickTree> = Array(alphabetSize, { FenwickTree(maxLength) }) // letter -> fenwick tree of changes
 
-    for ((position, symbol) in queries) {
+    fun edit(query: Query) {
+
+        val (index, symbol) = query
 
         var l = 0
-        var r = 200000
+        var r = maxLength
 
         while (r - l > 1) {
             val m: Int = (l + r) / 2
-            if (m - letterChanges[symbol.inAlphabet()].getPrefixSum(m) < position) {
+            if (m - letterChanges[symbol.inAlphabet()].getPrefixSum(m) < index) {
                 l = m
             } else {
                 r = m
             }
         }
 
-        val realPosition = r - 1
-        letterChanges[symbol.inAlphabet()].inc(realPosition + 1)
+        val truePosition = r - 1
+        letterChanges[symbol.inAlphabet()].inc(truePosition + 1)
         val perWord: Int = letterOccurrences[symbol.inAlphabet()].size
-        removed[(realPosition / perWord) * len + letterOccurrences[symbol.inAlphabet()][realPosition % perWord]] = true
+        val inResultingWord = (truePosition / perWord) * basicString.length +
+                letterOccurrences[symbol.inAlphabet()][truePosition % perWord]
+        isRemoved[inResultingWord] = true
     }
 
-    return string.repeat(k).filterIndexed { index, _ -> !removed[index] }
+    fun getResult(): String {
+        return basicString.repeat(numberOfCopies).filterIndexed { index, _ -> !isRemoved[index] }
+    }
+
+    data class Query(val index: Int, val symbol: Char)
 }
+
+fun solve(k: Int, string: String, queries: List<NameEditor.Query>): String {
+    val editor = NameEditor(string, k)
+    queries.forEach { editor.edit(it) }
+    return editor.getResult()
+}
+
+
 
 fun main(args: Array<String>) {
     val scanner = Scanner(System.`in`)
@@ -75,9 +92,10 @@ fun main(args: Array<String>) {
     val n = scanner.nextInt()
     scanner.nextLine()
 
-    val queries: List<Pair<Int, Char>> = List(n, { _ ->
+    val queries: List<NameEditor.Query> = List(n, { _ ->
         val tokenizer = StringTokenizer(scanner.nextLine())
-        Pair(Integer.parseInt(tokenizer.nextToken()), tokenizer.nextToken().first()) })
+        NameEditor.Query(Integer.parseInt(tokenizer.nextToken()), tokenizer.nextToken().first())
+    })
 
     println(solve(k, string, queries))
 }
