@@ -43,8 +43,9 @@ class Enumerate(
 ) : TexTag("enumerate", consumer, emptyList()), InDocumentEntity
 
 class Item(
-        override val consumer: TagConsumer<*>
-) : TexCommand("item", consumer, emptyList()), WithText
+        override val consumer: TagConsumer<*>,
+        override val parameters: List<String>
+) : TexCommand("item", consumer, parameters), WithText
 
 class Math(
         override val consumer: TagConsumer<*>
@@ -88,9 +89,9 @@ fun Tex.documentClass(name: String, vararg parameters: String) =
 
 fun InDocumentEntity.itemize(block: Itemize.() -> Unit) = Itemize(consumer).visit(block)
 
-fun Itemize.item(block: Item.() -> Unit) = Item(consumer).visit(block)
+fun Itemize.item(parameters: List<String> = emptyList(), block: Item.() -> Unit) = Item(consumer, parameters).visit(block)
 
-fun Enumerate.item(block: Item.() -> Unit) = Item(consumer).visit(block)
+fun Enumerate.item(parameters: List<String> = emptyList(), block: Item.() -> Unit) = Item(consumer, parameters).visit(block)
 
 fun InDocumentEntity.math(block: Math.() -> Unit) = Math(consumer).visit(block)
 
