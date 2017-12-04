@@ -103,5 +103,5 @@ fun InDocumentEntity.flushRight(block: FlushRight.() -> Unit) = FlushRight(consu
 fun TexEntity.customTag(name: String, vararg parameters: String, block: CustomTag.() -> Unit) =
         CustomTag(name, consumer, parameters.asList()).visit(block)
 
-fun WithText.text(string: String) = consumer.onTagContent(string)
+fun WithText.text(string: String) = consumer.onTagContent(string + "\n")
 
