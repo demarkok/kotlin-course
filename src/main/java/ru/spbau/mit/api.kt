@@ -1,7 +1,9 @@
 package ru.spbau.mit
 
-interface TagConsumer<out R> {
+@DslMarker
+annotation class TexEntityMarker
 
+interface TagConsumer<out R> {
     fun onTagStart(tag: Tag)
     fun onTagEnd(tag: Tag)
     fun onCommand(command: Command)
@@ -9,15 +11,19 @@ interface TagConsumer<out R> {
     fun finalize(): R
 }
 
-interface Tag : TexEntity
-
-interface Command : TexEntity
-
-interface TexEntity {
-
-    val consumer: TagConsumer<*>
+interface Tag : TexEntity {
     val name: String
     val parameters: List<String>
+}
+
+interface Command : TexEntity {
+    val name: String
+    val parameters: List<String>
+}
+
+@TexEntityMarker
+interface TexEntity {
+    val consumer: TagConsumer<*>
 }
 
 
