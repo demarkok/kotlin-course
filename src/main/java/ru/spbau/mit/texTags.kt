@@ -69,6 +69,12 @@ class CustomTag(
         override val parameters: List<String>
 ) : TexTag(name, consumer, parameters), InDocumentEntity
 
+class CustomCommand(
+        override val name: String,
+        override val consumer: TagConsumer<*>,
+        override val parameters: List<String>
+) : TexCommand(name, consumer, parameters), InDocumentEntity
+
 
 fun <T, C : TagConsumer<T>> C.tex(block: Tex.() -> Unit = {}): T = Tex(this).run {
     block()
@@ -91,9 +97,9 @@ fun InDocumentEntity.itemize(block: Itemize.() -> Unit) = Itemize(consumer).visi
 
 fun InDocumentEntity.enumerate(block: Enumerate.() -> Unit) = Enumerate(consumer).visit(block)
 
-fun Itemize.item(parameters: List<String> = emptyList(), block: Item.() -> Unit) = Item(consumer, parameters).visit(block)
+fun Itemize.item(parameters: List<String> = emptyList(), block: Item.() -> Unit = {}) = Item(consumer, parameters).visit(block)
 
-fun Enumerate.item(parameters: List<String> = emptyList(), block: Item.() -> Unit) = Item(consumer, parameters).visit(block)
+fun Enumerate.item(parameters: List<String> = emptyList(), block: Item.() -> Unit = {}) = Item(consumer, parameters).visit(block)
 
 fun InDocumentEntity.math(block: Math.() -> Unit) = Math(consumer).visit(block)
 
@@ -105,6 +111,9 @@ fun InDocumentEntity.flushRight(block: FlushRight.() -> Unit) = FlushRight(consu
 
 fun TexEntity.customTag(name: String, vararg parameters: String, block: CustomTag.() -> Unit) =
         CustomTag(name, consumer, parameters.asList()).visit(block)
+
+fun TexEntity.customCommand(name: String, vararg parameters: String, block: CustomCommand.() -> Unit = {}) =
+        CustomCommand(name, consumer, parameters.asList()).visit(block)
 
 fun WithText.text(string: String) = consumer.onTagContent(string + "\n")
 
