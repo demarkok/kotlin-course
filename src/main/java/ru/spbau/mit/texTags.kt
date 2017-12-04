@@ -57,11 +57,11 @@ class Center(
 
 class FlushLeft(
         override val consumer: TagConsumer<*>
-) : TexTag("flashleft", consumer, emptyList()), InDocumentEntity
+) : TexTag("flushleft", consumer, emptyList()), InDocumentEntity
 
 class FlushRight(
         override val consumer: TagConsumer<*>
-) : TexTag("flashright", consumer, emptyList()), InDocumentEntity
+) : TexTag("flushright", consumer, emptyList()), InDocumentEntity
 
 class CustomTag(
         override val name: String,
