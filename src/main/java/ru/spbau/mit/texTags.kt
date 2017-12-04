@@ -89,6 +89,8 @@ fun Tex.documentClass(name: String, vararg parameters: String) =
 
 fun InDocumentEntity.itemize(block: Itemize.() -> Unit) = Itemize(consumer).visit(block)
 
+fun InDocumentEntity.enumerate(block: Enumerate.() -> Unit) = Enumerate(consumer).visit(block)
+
 fun Itemize.item(parameters: List<String> = emptyList(), block: Item.() -> Unit) = Item(consumer, parameters).visit(block)
 
 fun Enumerate.item(parameters: List<String> = emptyList(), block: Item.() -> Unit) = Item(consumer, parameters).visit(block)
