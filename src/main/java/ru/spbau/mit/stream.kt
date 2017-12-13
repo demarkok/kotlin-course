@@ -2,7 +2,7 @@ package ru.spbau.mit
 
 class TexStreamBuilder<out O : Appendable>(private val out: O) : TagConsumer<O> {
 
-    override fun onCommand(command: Command) {
+    override fun onCommand(command: TexCommand) {
         out.append("""\${command.name}""")
         command.parameters.let {
             if (it.size >= 2) {
@@ -15,13 +15,13 @@ class TexStreamBuilder<out O : Appendable>(private val out: O) : TagConsumer<O> 
         out.appendln()
     }
 
-    override fun onTagStart(tag: Tag) {
+    override fun onTagStart(tag: TexTag) {
         out.append("""\begin{${tag.name}}""")
         printParameters(tag.parameters)
         out.appendln()
     }
 
-    override fun onTagEnd(tag: Tag) {
+    override fun onTagEnd(tag: TexTag) {
         out.append("""\end{${tag.name}}""")
         out.appendln()
     }

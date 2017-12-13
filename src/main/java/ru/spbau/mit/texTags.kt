@@ -1,78 +1,78 @@
 package ru.spbau.mit
 
-interface InDocumentEntity : WithText
-
 interface WithText : TexEntity {
     operator fun String.unaryPlus() {
-        text(this)
+        consumer.onTagContent(this + "\n")
     }
 }
+
+interface InDocumentEntity : WithText
 
 class Tex(override val consumer: TagConsumer<*>) : TexEntity
 
 class Document(
-        override val consumer: TagConsumer<*>
+        consumer: TagConsumer<*>
 ) : TexTag("document", consumer, emptyList()), InDocumentEntity
 
 class DocumentClass(
-        override val consumer: TagConsumer<*>,
-        override val parameters: List<String>
+        consumer: TagConsumer<*>,
+        parameters: List<String>
 ) : TexCommand("documentclass", consumer, parameters)
 
 class UsePackage(
-        override val consumer: TagConsumer<*>,
-        override val parameters: List<String>
+        consumer: TagConsumer<*>,
+        parameters: List<String>
 ) : TexCommand("usepackage", consumer, parameters)
 
 class Frame(
-        override val consumer: TagConsumer<*>,
-        override val parameters: List<String>
+        consumer: TagConsumer<*>,
+        parameters: List<String>
 ) : TexTag("frame", consumer, parameters), InDocumentEntity
 
 class FrameTitle(
-        override val name: String,
-        override val consumer: TagConsumer<*>
+        name: String,
+        consumer: TagConsumer<*>
 ) : TexCommand("frametitle", consumer, listOf(name))
 
 class Itemize(
-        override val consumer: TagConsumer<*>
+        consumer: TagConsumer<*>
 ) : TexTag("itemize", consumer, emptyList()), InDocumentEntity
 
 class Enumerate(
-        override val consumer: TagConsumer<*>
+        consumer: TagConsumer<*>
 ) : TexTag("enumerate", consumer, emptyList()), InDocumentEntity
 
 class Item(
-        override val consumer: TagConsumer<*>,
-        override val parameters: List<String>
+        consumer: TagConsumer<*>,
+        parameters: List<String>
 ) : TexCommand("item", consumer, parameters), WithText
 
 class Math(
-        override val consumer: TagConsumer<*>
+        consumer: TagConsumer<*>
 ) : TexTag("math", consumer, emptyList()), WithText
 
 class Center(
-        override val consumer: TagConsumer<*>
+        consumer: TagConsumer<*>
 ) : TexTag("center", consumer, emptyList()), InDocumentEntity
 
 class FlushLeft(
-        override val consumer: TagConsumer<*>
+        consumer: TagConsumer<*>
 ) : TexTag("flushleft", consumer, emptyList()), InDocumentEntity
 
 class FlushRight(
-        override val consumer: TagConsumer<*>
+        consumer: TagConsumer<*>
 ) : TexTag("flushright", consumer, emptyList()), InDocumentEntity
 
 class CustomTag(
-        override val name: String,
-        override val consumer: TagConsumer<*>,
-        override val parameters: List<String>
+        name: String,
+        consumer: TagConsumer<*>,
+        parameters: List<String>
 ) : TexTag(name, consumer, parameters), InDocumentEntity
 
 class CustomCommand(
-        override val name: String,
-        override val consumer: TagConsumer<*>,
-        override val parameters: List<String>
+        name: String,
+        consumer: TagConsumer<*>,
+        parameters: List<String>
 ) : TexCommand(name, consumer, parameters), InDocumentEntity
 
 
@@ -114,6 +114,3 @@ fun TexEntity.customTag(name: String, vararg parameters: String, block: CustomTa
 
 fun TexEntity.customCommand(name: String, vararg parameters: String, block: CustomCommand.() -> Unit = {}) =
         CustomCommand(name, consumer, parameters.asList()).visit(block)
-
-fun WithText.text(string: String) = consumer.onTagContent(string + "\n")
-

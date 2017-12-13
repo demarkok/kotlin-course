@@ -4,22 +4,24 @@ package ru.spbau.mit
 annotation class TexEntityMarker
 
 interface TagConsumer<out R> {
-    fun onTagStart(tag: Tag)
-    fun onTagEnd(tag: Tag)
-    fun onCommand(command: Command)
+    fun onTagStart(tag: TexTag)
+    fun onTagEnd(tag: TexTag)
+    fun onCommand(command: TexCommand)
     fun onTagContent(content: CharSequence)
     fun finalize(): R
 }
 
-interface Tag : TexEntity {
-    val name: String
-    val parameters: List<String>
-}
+open class TexTag(
+        val name: String,
+        override val consumer: TagConsumer<*>,
+        val parameters: List<String>
+) : TexEntity
 
-interface Command : TexEntity {
-    val name: String
-    val parameters: List<String>
-}
+open class TexCommand(
+        val name: String,
+        override val consumer: TagConsumer<*>,
+        val parameters: List<String>
+) : TexEntity
 
 @TexEntityMarker
 interface TexEntity {
@@ -27,13 +29,13 @@ interface TexEntity {
 }
 
 
-fun <T : Tag> T.visit(block: T.() -> Unit) {
+fun <T : TexTag> T.visit(block: T.() -> Unit) {
     consumer.onTagStart(this)
     this.block()
     consumer.onTagEnd(this)
 }
 
-fun <C : Command> C.visit(block: C.() -> Unit) {
+fun <C : TexCommand> C.visit(block: C.() -> Unit) {
     consumer.onCommand(this)
     this.block()
 }
