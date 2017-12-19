@@ -45,6 +45,14 @@ class ParsingTest {
     }
 
     @Test
+    fun functionDeclarationWithoutParametersTest() {
+        val s = "fun run() { }"
+        val root = parse(s)
+        val expected = File(Block(listOf(FunctionDeclaration("run", emptyList(), Block(emptyList())))))
+        assertEquals(expected, root)
+    }
+
+    @Test
     fun whileTest() {
         val s = """
             |
@@ -128,6 +136,14 @@ class ParsingTest {
     }
 
     @Test
+    fun functionCallWithoutParametersTest() {
+        val s = "run()"
+        val root = parse(s)
+        val expected = File(Block(listOf(FunctionCall("run", emptyList()))))
+        assertEquals(expected, root)
+    }
+
+    @Test
     fun printlnTest() {
         val s = "println(239, x)"
 
@@ -136,6 +152,14 @@ class ParsingTest {
                 Println(listOf(Literal(239), VariableIdentifier("x")))
         )))
         assertEquals(expectedRoot, root)
+    }
+
+    @Test
+    fun emptyPrintlnTest() {
+        val s = "println()"
+        val root = parse(s)
+        val expected = File(Block(listOf(Println(emptyList()))))
+        assertEquals(expected, root)
     }
 
     @Test

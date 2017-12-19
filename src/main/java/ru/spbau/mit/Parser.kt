@@ -16,7 +16,6 @@ fun parse(sourceCode: String): File {
     val lexer = LanguageLexer(charStream)
     val tokens = CommonTokenStream(lexer)
     val parser = LanguageParser(tokens)
-
     val fileVisitor = FileVisitor
     return fileVisitor.visit(parser.file())
 }
@@ -43,7 +42,7 @@ private object StatementVisitor : LanguageBaseVisitor<Statement>() {
         val functionDeclaration = ctx.functionDeclaration()
 
         val name: String = functionDeclaration.Identifier().text
-        val parameters: List<String> = functionDeclaration.parameterNames().Identifier().map { it.text }
+        val parameters: List<String> = functionDeclaration.parameterNames()?.Identifier()?.map { it.text } ?: emptyList()
         val body: Block = functionDeclaration.blockWithBraces().block().accept(BlockVisitor)
 
         return FunctionDeclaration(name, parameters, body)
@@ -89,7 +88,7 @@ private object StatementVisitor : LanguageBaseVisitor<Statement>() {
             Return(ctx.expression().accept(ExpressionVisitor))
 
     override fun visitPrintlnStatement(ctx: PrintlnStatementContext): Statement =
-            Println(ctx.arguments().expression().map { it.accept(ExpressionVisitor) })
+            Println(ctx.arguments()?.expression()?.map { it.accept(ExpressionVisitor) } ?: emptyList())
 }
 
 
@@ -115,8 +114,8 @@ private object ExpressionVisitor : LanguageBaseVisitor<Expression>() {
         val name: String = functionCall.Identifier().text
         val arguments: List<Expression> = functionCall
                 .arguments()
-                .expression()
-                .map { it.accept(ExpressionVisitor) }
+                ?.expression()
+                ?.map { it.accept(ExpressionVisitor) } ?: emptyList()
 
         return FunctionCall(name, arguments)
     }
