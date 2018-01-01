@@ -1,0 +1,10 @@
+fun gcd(a, b) {
+    if (a == 0) {
+        return b
+    } else {
+        return gcd(b % a, a)
+    }
+}
+
+println(gcd(12, 18))
+println(gcd(1, 60))

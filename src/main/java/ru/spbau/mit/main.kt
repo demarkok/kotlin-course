@@ -1,14 +1,7 @@
 package ru.spbau.mit
 
-fun getGreeting(): String {
-    val words = mutableListOf<String>()
-    words.add("Hello,")
-    
-    words.add("world!")
-
-    return words.joinToString(separator = " ")
-}
+import java.nio.file.Paths
 
 fun main(args: Array<String>) {
-    println(getGreeting())
+    interpretFile(Paths.get(args.first()), System.out)
 }
