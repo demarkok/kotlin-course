@@ -1,8 +1,10 @@
 package ru.spbau.mit
 
-import java.nio.file.Paths
+import ru.spbau.mit.debug.Repl
+import java.io.BufferedWriter
+import java.io.OutputStreamWriter
 
 fun main(args: Array<String>) {
-    interpretFile(Paths.get(args.first()), System.out)
+    Repl(System.`in`.bufferedReader(), BufferedWriter(OutputStreamWriter(System.out))).run()
 }
 

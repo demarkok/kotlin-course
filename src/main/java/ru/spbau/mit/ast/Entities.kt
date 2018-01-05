@@ -1,26 +1,18 @@
 package ru.spbau.mit.ast
 
-import ru.spbau.mit.exceptions.FunctionIsNotDefinedException
-import ru.spbau.mit.exceptions.VariableIsNotDefinedException
-
-
-fun ContextInterface.resolveVariableOrThrow(name: String) =
-        this.resolveVariable(name) ?: throw VariableIsNotDefinedException()
-
-fun ContextInterface.resolveFunctionOrThrow(name: String) =
-        this.resolveFunction(name) ?: throw FunctionIsNotDefinedException()
 
 interface ASTEntity {
+    val line: Int
     fun <T> accept(visitor: ASTVisitor<T>): T
 }
 
-data class File(val block: Block) : ASTEntity {
+data class File(override val line: Int, val block: Block) : ASTEntity {
     override fun <T> accept(visitor: ASTVisitor<T>): T {
         return visitor.visit(this)
     }
 }
 
-data class Block(val statements: List<Statement>) : ASTEntity {
+data class Block(override val line: Int, val statements: List<Statement>) : ASTEntity {
     override fun <T> accept(visitor: ASTVisitor<T>): T {
         return visitor.visit(this)
     }
@@ -29,6 +21,7 @@ data class Block(val statements: List<Statement>) : ASTEntity {
 interface Statement : ASTEntity
 
 data class FunctionDeclaration(
+        override val line: Int,
         val name: String,
         val parameterNames: List<String>,
         val body: Block
@@ -39,7 +32,8 @@ data class FunctionDeclaration(
     }
 }
 
-data class VariableDeclaration(val name: String,
+data class VariableDeclaration(override val line: Int,
+                               val name: String,
                                val value: Expression? = null
 ) : Statement {
 
@@ -48,7 +42,8 @@ data class VariableDeclaration(val name: String,
     }
 }
 
-data class While(val condition: Expression,
+data class While(override val line: Int,
+                 val condition: Expression,
                  val body: Block
 ) : Statement {
 
@@ -57,7 +52,8 @@ data class While(val condition: Expression,
     }
 }
 
-data class If(val condition: Expression,
+data class If(override val line: Int,
+              val condition: Expression,
               val body: Block,
               val elseBody: Block?
 ) : Statement {
@@ -67,27 +63,34 @@ data class If(val condition: Expression,
     }
 }
 
-data class VariableAssignment(val name: String, val value: Expression) : Statement {
+data class VariableAssignment(override val line: Int, val name: String, val value: Expression) : Statement {
     override fun <T> accept(visitor: ASTVisitor<T>): T {
         return visitor.visit(this)
     }
 }
 
-data class Return(val expression: Expression) : Statement {
+data class Return(override val line: Int, val expression: Expression) : Statement {
     override fun <T> accept(visitor: ASTVisitor<T>): T {
         return visitor.visit(this)
     }
 }
 
-data class Println(val arguments: List<Expression>) : Statement {
+data class Println(override val line: Int, val arguments: List<Expression>) : Statement {
     override fun <T> accept(visitor: ASTVisitor<T>): T {
         return visitor.visit(this)
     }
 }
 
-interface Expression : Statement
+data class ExpressionStatement(override val line: Int, val expression: Expression) : Statement {
+    override fun <T> accept(visitor: ASTVisitor<T>): T {
+        return visitor.visit(this)
+    }
+}
 
-data class FunctionCall(val name: String,
+interface Expression : ASTEntity
+
+data class FunctionCall(override val line: Int,
+                        val name: String,
                         val arguments: List<Expression>
 ) : Expression {
 
@@ -97,7 +100,8 @@ data class FunctionCall(val name: String,
 }
 
 
-data class BinaryExpression(val leftOperand: Expression,
+data class BinaryExpression(override val line: Int,
+                            val leftOperand: Expression,
                             val operator: BinaryOperator,
                             val rightOperand: Expression
 ) : Expression {
@@ -107,14 +111,14 @@ data class BinaryExpression(val leftOperand: Expression,
     }
 }
 
-data class VariableIdentifier(val name: String) : Expression {
+data class VariableIdentifier(override val line: Int, val name: String) : Expression {
 
     override fun <T> accept(visitor: ASTVisitor<T>): T {
         return visitor.visit(this)
     }
 }
 
-data class Literal(val value: Int) : Expression {
+data class Literal(override val line: Int, val value: Int) : Expression {
 
     override fun <T> accept(visitor: ASTVisitor<T>): T {
         return visitor.visit(this)

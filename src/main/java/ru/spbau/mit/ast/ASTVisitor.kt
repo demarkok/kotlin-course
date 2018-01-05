@@ -14,4 +14,5 @@ interface ASTVisitor<out T> {
     fun visit(functionCall: FunctionCall): T
     fun visit(variableIdentifier: VariableIdentifier): T
     fun visit(literal: Literal): T
+    fun visit(expressionStatement: ExpressionStatement): T
 }
